@@ -47,7 +47,10 @@ module.exports = (sequelize, Sequelize) => {
       },
       technician: {
         type: Sequelize.STRING,
-        allowNull: false,
+        defaultValue: null,
+        validate: {
+          notEmpty: true
+        }
       },
       approval_date: {
         type: Sequelize.STRING,

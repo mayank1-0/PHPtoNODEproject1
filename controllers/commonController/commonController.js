@@ -10,6 +10,7 @@ const createAllTablesData = async (req, res) => {
         const State = db.State;
         const Work_Order = db.Work_Order;
         const Technician = db.Technician;
+        const Appointment = db.Appointment;
 
         const result0 = await Technician.create({
             name: "Mayank",
@@ -71,7 +72,18 @@ const createAllTablesData = async (req, res) => {
         status: 0,
         comment: "hahaha"
       });
-      res.status(200).send({ success: true, message: "Data in all tables created successfully", data: { result0, result1, result2, result3, result4, result5}});
+      const result6 = await Appointment.create({
+        customer_id: 1,
+        technician_id: 1,
+        address: "221B",
+        city: "London",
+        state: "London",
+        machine: "test machine",
+        message: "Hola Ho",
+        status: 0,
+        date: "01-01-2001",
+      });
+      res.status(200).send({ success: true, message: "Data in all tables created successfully", data: { result0, result1, result2, result3, result4, result5, result6 }});
     } catch (error) {
         res.status(500).send({ success: false, message: "Something went wrong" + error})
     }

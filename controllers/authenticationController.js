@@ -20,13 +20,11 @@ const createTechnician = async (req, res) => {
       android_token: "token",
       ios_token: "token",
     });
-    res
-      .status(200)
-      .send({
-        success: true,
-        message: "Technician created successfully",
-        data: result,
-      });
+    res.status(200).send({
+      success: true,
+      message: "Technician created successfully",
+      data: result,
+    });
   } catch (error) {
     res
       .status(500)
@@ -80,12 +78,10 @@ const userLogin = async (req, res) => {
           });
         }
       } else {
-        res
-          .status(400)
-          .send({
-            data: userData,
-            message: "User account with the provided email is inactive",
-          });
+        res.status(400).send({
+          data: userData,
+          message: "User account with the provided email is inactive",
+        });
       }
     }
   } catch (e) {
@@ -153,13 +149,11 @@ const sendResetPasswordEmail = async (req, res) => {
       },
     });
     if (!technician_data) {
-      res
-        .status(401)
-        .send({
-          success: false,
-          message:
-            "No technician with the given email exists in the database. Kindly register first",
-        });
+      res.status(401).send({
+        success: false,
+        message:
+          "No technician with the given email exists in the database. Kindly register first",
+      });
     } else {
       var generated_token = randtoken.generate(20);
       console.log("---- ", generated_token);
@@ -170,12 +164,10 @@ const sendResetPasswordEmail = async (req, res) => {
         }
       );
       if (!result) {
-        res
-          .status(400)
-          .send({
-            success: false,
-            message: "Unable to update generated token in database.",
-          });
+        res.status(400).send({
+          success: false,
+          message: "Unable to update generated token in database.",
+        });
       } else {
         var sent = await sendEmail(email, generated_token);
         var type = "";
@@ -215,39 +207,45 @@ const sendResetPasswordEmail = async (req, res) => {
 
 const passwordUpdate = async (req, res) => {
   try {
-    const token = req.params.token;
-    const update_data = req.body;
-    const Technician = db.Technician;
-    const result = await Technician.findOne({
-      where: {
-        token: token,
-      },
-    });
-    var type;
-    var msg;
-    if (!result) {
-      res
-        .status(404)
-        .send({
+    // const token = req.params.token;
+    const update_data = req.body; // has token, newPassword, confirmPassword
+    if (update_data.newPassword !== update_data.confirmPassword) {
+      res.status(401).send({
+        success: false,
+        message:
+          "New password and confirm new password field value should be same",
+      });
+    } else {
+      const Technician = db.Technician;
+      const result = await Technician.findOne({
+        where: {
+          usertoken: update_data.token,
+        },
+      });
+      var type;
+      var msg;
+      if (!result) {
+        res.status(404).send({
           success: false,
           message: "No such technician with the given token exists",
         });
-    } else {
-      var saltRounds = 10;
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hash = await bcrypt.hash(update_data.newPassword, salt);
-      const data = {
-        password: hash,
-      };
-      const result1 = await Technician.update(
-        { password: data.password },
-        {
-          where: { token: token },
-        }
-      );
-      type = "success";
-      msg = "Your password has been updated successfully";
-      res.status(200).send({ success: type, data: result1, message: msg });
+      } else {
+        var saltRounds = 10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hash = await bcrypt.hash(update_data.newPassword, salt);
+        const data = {
+          password: hash,
+        };
+        const result1 = await Technician.update(
+          { password: data.password },
+          {
+            where: { usertoken: update_data.token },
+          }
+        );
+        type = "success";
+        msg = "Your password has been updated successfully";
+        res.status(200).send({ success: type, data: result1, message: msg });
+      }
     }
   } catch (error) {
     res.status(500).send({
