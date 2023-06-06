@@ -4,24 +4,31 @@ const config = require("../config.json");
 
 const createWorkOrder = async (req, res) => {
   try {
-    // const Work_Order = db.Work_Order;
-    // const result = await Work_Order.create({
-    //   customer_id: ,
-    //   start_date: ,
-    //   target_date: ,
-    //   work_order_type: ,
-    //   description: ,
-    //   machine: ,
-    //   source: 0,
-    //   destination: ,
-    //   machineasstno: ,
-    //   machinemovedate: ,
-    //   technician: ,
-    //   approval_date:,
-    //   status: ,
-    //   comment:
-    // });
-    // res.status(200).send({ success: true, message: "Work Order created successfully", data: result});
+    const workOrderData = req.body;
+    const Work_Order = db.Work_Order;
+    const result = await Work_Order.create({
+      customer_id: workOrderData.customer_id,
+      start_date: workOrderData.start_date,
+      target_date: workOrderData.target_date,
+      order_type: workOrderData.work_order_type,
+      description: workOrderData.description,
+      machine: workOrderData.machine,
+      source: workOrderData.source,
+      destination: workOrderData.destination,
+      machineasstno: workOrderData.machineasstno,
+      machinemovedate: workOrderData.machinemovedate,
+      technician: workOrderData.technician,
+      approval_date: workOrderData.approval_date,
+      status: workOrderData.status,
+      comment: workOrderData.comment,
+    });
+    res
+      .status(200)
+      .send({
+        success: true,
+        message: "Work Order created successfully",
+        data: result,
+      });
   } catch (error) {
     res
       .status(500)
@@ -54,7 +61,7 @@ const fetchNewWorkOrder = async (req, res) => {
   try {
     const Work_Order = db.Work_Order;
     var newWorkOrder = await Work_Order.findAll({
-      where: { technician: null, technician: ""},
+      where: { technician: null, technician: "" },
     });
     if (!newWorkOrder) {
       res.status(401).send({ success: false, message: "No new work orders" });
@@ -110,14 +117,12 @@ const fetchAllWorkOrder = async (req, res) => {
       res.status(401).send({ success: false, message: "No work orders" });
     } else {
       let count = allWorkOrder.length;
-      res
-        .status(200)
-        .send({
-          success: true,
-          message: "Work orders are there",
-          data: allWorkOrder,
-          count: count,
-        });
+      res.status(200).send({
+        success: true,
+        message: "Work orders are there",
+        data: allWorkOrder,
+        count: count,
+      });
     }
   } catch (error) {
     res
@@ -130,38 +135,67 @@ const fetchLocationsCustomers = async (req, res) => {
   try {
     const Customers = db.Customer;
     const result = await Customers.findAll({
-      attributes: [ "name", "city", "state_name", "phone", "customer_type", "territory" ]
+      attributes: [
+        "name",
+        "city",
+        "state_name",
+        "phone",
+        "customer_type",
+        "territory",
+      ],
     });
-    if( !result ){
-      res.status(404).send({success: false, message: "No customer locations are present in the database"});
-    }
-    else{
-      res.status(200).send({success: true, message: "Customer locations fetched successfully", data: result});
+    if (!result) {
+      res
+        .status(404)
+        .send({
+          success: false,
+          message: "No customer locations are present in the database",
+        });
+    } else {
+      res
+        .status(200)
+        .send({
+          success: true,
+          message: "Customer locations fetched successfully",
+          data: result,
+        });
     }
   } catch (error) {
     res
       .status(500)
       .send({ success: false, message: "Something went wrong " + error });
   }
-}
+};
 
 const archiveMyWorkOrder = async (req, res) => {
   try {
     const Work_Order = db.Work_Order;
     const workOrderId = req.params.id;
-    const update = await Work_Order.update({ status: 4 },{
-      where: { id: workOrderId }
-    })
-    if( !update ){
-      res.status(400).send({ success: false, message: "Work order archive failed."})
-    }
-    else{
-    res.status(200).send({ success: true, message: "Work order archived successfully", data: update});
+    const update = await Work_Order.update(
+      { status: 4 },
+      {
+        where: { id: workOrderId },
+      }
+    );
+    if (!update) {
+      res
+        .status(400)
+        .send({ success: false, message: "Work order archive failed." });
+    } else {
+      res
+        .status(200)
+        .send({
+          success: true,
+          message: "Work order archived successfully",
+          data: update,
+        });
     }
   } catch (error) {
-    res.status(500).send({ succes: false, message: "Something went wrong " + error})
+    res
+      .status(500)
+      .send({ succes: false, message: "Something went wrong " + error });
   }
-}
+};
 
 module.exports = {
   createWorkOrder,
@@ -171,5 +205,5 @@ module.exports = {
 
   fetchLocationsCustomers,
 
-  archiveMyWorkOrder
+  archiveMyWorkOrder,
 };

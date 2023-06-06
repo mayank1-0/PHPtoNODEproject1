@@ -21,6 +21,7 @@
     "sequelize": "^6.31.1"
   },
   "devDependencies": {
+    "eslint": "^8.42.0",
     "nodemon": "^2.0.22"
   }
 }
